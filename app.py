@@ -49,6 +49,8 @@ template = """
             max-width: 1200px;
             margin-left: auto;
             margin-right: auto;
+            padding-left: 30px;
+            padding-right: 30px;
             min-width: 640px;
         }
     </style>
