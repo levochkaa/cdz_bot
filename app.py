@@ -1,5 +1,3 @@
-import os
-
 import mesh
 import django
 from django.conf import settings
@@ -7,19 +5,15 @@ from aiogram.types import InputFile
 from django.template import Template, Context
 from aiogram import Bot, Dispatcher, executor, types
 
-from dotenv import load_dotenv
-load_dotenv()
-
-TEMPLATES = [{'BACKEND': 'django.template.backends.django.DjangoTemplates'}]
-settings.configure(TEMPLATES=TEMPLATES)
+settings.configure(TEMPLATES=[{'BACKEND': 'django.template.backends.django.DjangoTemplates'}])
 django.setup()
-bot = Bot(os.environ['TOKEN'])
+bot = Bot("2119600702:AAGkGcOHqh9iO8BnGiVc7yS388LAbHQk2X4")
 dp = Dispatcher(bot)
 template = """
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Ответы для {{ user_id }}</title>
+    <title>ответики</title>
     <style>
         html {
             font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
@@ -28,13 +22,6 @@ template = """
             line-height: 1.5;
             -webkit-text-size-adjust: 100%;
             background: black;
-            color: #666;
-        }
-        body {
-            display: block;
-            margin: 8px;
-            background: black;
-            border-radius: 15px;
         }
         p {
             display: block;
@@ -44,58 +31,37 @@ template = """
             margin-inline-end: 0;
             margin: 0 0 20px 0;
         }
-        hr {
-            margin: 0 0 20px 0;
-            text-align: inherit;
-            display: block;
-            unicode-bidi: isolate;
-            margin-block-start: 0.5em;
-            margin-block-end: 0.5em;
-            margin-inline-start: auto;
-            margin-inline-end: auto;
-            overflow: hidden;
-            border-style: inset;
-            border-width: 1px;
-        }
-        .uk-card{
+        .card {
             border-radius: 15px;
             box-sizing: border-box;
             width: 100%;
             max-width: 100%;
             display: flow-root;
             padding: 30px 30px;
+            margin-bottom: 30px;
+            margin-top: 30px;
             box-shadow: 0 5px 15px rgba(255,255,255,.08);
+            background: white;
         }
-        .uk-container {
+        .cards {
             display: flow-root;
             box-sizing: content-box;
             max-width: 1200px;
             margin-left: auto;
             margin-right: auto;
-            padding-left: 30px;
-            padding-right: 30px;
             min-width: 640px;
-        }
-        .uk-divider-icon {
-            position: relative;
-            height: 10px;
-            background-image: url(data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%3Ccircle%20fill%3D%22none%22%20stroke%3D%22%23e5e5e5%22%20stroke-width%3D%222%22%20cx%3D%2210%22%20cy%3D%2210%22%20r%3D%227%22%20%2F%3E%0A%3C%2Fsvg%3E%0A);
-            background-repeat: no-repeat;
-            background-position: 50% 50%;
         }
     </style>
 </head>
 <body>
-    <div id="tasks" class="uk-container">
+    <div class="cards">
         {% for task, ans in tasks %}
-        <hr class="uk-divider-icon" style="visibility: hidden">
-        <div class="uk-card" style="background: white;">
+        <div class="card">
             <p>{{ task }}</p>
             <br>
             <p><b>Ответ:</b></p>
             <p>{{ ans }}</p>
         </div>
-        <hr class="uk-divider-icon" style="visibility: hidden">
         {% endfor %}
     </div>
 </body>
@@ -110,8 +76,7 @@ async def send_text(message: types.Message):
         for task, ans in answers:
             await message.answer(f"{task}\n"
                                  f"Ответ: {ans}")
-        c = Context({"user_id": message.from_user.id,
-                     "tasks": answers})
+        c = Context({"tasks": answers})
         with open('index.html', 'w') as i:
             i.write(t.render(c))
         await message.answer_document(InputFile('index.html'),
