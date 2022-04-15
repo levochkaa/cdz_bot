@@ -1,3 +1,4 @@
+import re
 import mesh
 import django
 from django.conf import settings
@@ -75,6 +76,7 @@ t = Template(template)
 async def send_text(message: types.Message):
     try:
         answers = mesh.get_answers(message.text)
+        # re.findall(pattern="https?://[\S][^>]+", string=task)[0]
         for task, ans in answers:
             await message.answer(f"{task}\n"
                                  f"Ответ: {ans}")
