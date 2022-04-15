@@ -3,3 +3,4 @@ __pycache__
 venv
 app.zip
 index.html
+.DS_Store
