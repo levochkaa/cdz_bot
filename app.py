@@ -81,6 +81,10 @@ template = Template("""
 </html>
 """)
 
+@dp.message_handler(commands=["start"])
+async def start(message: types.Message):
+    await message.answer("кидай ссылку")
+
 @dp.message_handler(content_types='text')
 async def send_text(message: types.Message):
     if re.search(r"https://uchebnik.mos.ru/[\S][^>]+", message.text) == None:
