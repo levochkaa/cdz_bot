@@ -2,15 +2,20 @@ import re
 import mesh
 import django
 from django.conf import settings
-from aiogram.types import InputFile
 from django.template import Template, Context
+from django.template.defaulttags import register
+from aiogram.types import InputFile
 from aiogram import Bot, Dispatcher, executor, types
+
+@register.filter
+def get_value(dictionary, key):
+    return dictionary[key]
 
 settings.configure(TEMPLATES=[{'BACKEND': 'django.template.backends.django.DjangoTemplates'}])
 django.setup()
 bot = Bot("2119600702:AAGkGcOHqh9iO8BnGiVc7yS388LAbHQk2X4")
 dp = Dispatcher(bot)
-template = """
+template = Template("""
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -31,6 +36,9 @@ template = """
             margin-inline-start: 0;
             margin-inline-end: 0;
             margin: 0 0 20px 0;
+        }
+        img {
+            margin-bottom: 30px
         }
         .card {
             border-radius: 15px;
@@ -58,32 +66,51 @@ template = """
 </head>
 <body>
     <div class="cards">
-        {% for task, ans in tasks %}
+        {% for item in tasks %}
         <div class="card">
-            <p>{{ task }}</p>
-            <br>
+            <p>{{ item.task }}</p>
+            {% if item.photo != None %}
+                <img src="{{ item.photo }}">
+            {% endif %}
             <p><b>Ответ:</b></p>
-            <p>{{ ans }}</p>
+            <p>{{ item.ans }}</p>
         </div>
         {% endfor %}
     </div>
 </body>
 </html>
-"""
-t = Template(template)
+""")
 
 @dp.message_handler(content_types='text')
 async def send_text(message: types.Message):
+    if re.search(r"https://uchebnik.mos.ru/[\S][^>]+", message.text) == None:
+        return await message.answer("это не ссылка")
     try:
-        answers = mesh.get_answers(message.text)
-        # re.findall(pattern="https?://[\S][^>]+", string=task)[0]
+        answers, fixed_answers = mesh.get_answers(message.text), []
         for task, ans in answers:
-            await message.answer(f"{task}\n"
-                                 f"Ответ: {ans}")
-        c = Context({"tasks": answers})
-        with open('index.html', 'w') as i:
-            i.write(t.render(c))
-        await message.answer_document(InputFile('index.html'),
+            r = re.search(r"https://uchebnik.mos.ru/cmshttps://uchebnik.mos.ru/cms/[\S][^>]+", task)
+            ans = ans if ans != "" else "сорян, ответа нет, пиши сам"
+            if r == None:
+                await message.answer(f"{task}\n"
+                                    f"Ответ: {ans}")
+                fixed_answers.append({
+                    "task": task,
+                    "ans": ans,
+                    "photo": None
+                })
+            else:
+                start = r.span()[0]
+                await message.answer_photo(photo=f"{task[start:-2]}",
+                                           caption=f"{task[:start - 1]}\n"
+                                           f"Ответ: {ans}")
+                fixed_answers.append({
+                    "task": task[:start - 1],
+                    "ans": ans,
+                    "photo": task[start:-2]
+                })
+        with open('site.html', 'w') as site:
+            site.write(template.render(Context({"tasks": fixed_answers})))
+        await message.answer_document(InputFile('site.html'),
                                       caption="ответики сайтиком")
     except Exception as e:
         await message.answer("типо ошибка но ответы мб норм")
