@@ -7,10 +7,6 @@ from django.template.defaulttags import register
 from aiogram.types import InputFile
 from aiogram import Bot, Dispatcher, executor, types
 
-@register.filter
-def get_value(dictionary, key):
-    return dictionary[key]
-
 settings.configure(TEMPLATES=[{'BACKEND': 'django.template.backends.django.DjangoTemplates'}])
 django.setup()
 bot = Bot("2119600702:AAGkGcOHqh9iO8BnGiVc7yS388LAbHQk2X4")
