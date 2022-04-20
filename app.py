@@ -88,7 +88,7 @@ async def send_text(message: types.Message):
     try:
         answers, fixed_answers = mesh.get_answers(message.text), []
         for task, ans in answers:
-            r = re.search(r"https://uchebnik.mos.ru/cmshttps://uchebnik.mos.ru/cms/[\S][^>]+", task)
+            r = re.search(r"https://uchebnik.mos.ru/[\S][^>]+", task)
             ans = ans if ans != "" else "сорян, ответа нет, пиши сам"
             if r == None:
                 await message.answer(f"{task}\n"
