@@ -4,3 +4,4 @@ venv
 app.zip
 site.html
 .DS_Store
+.env

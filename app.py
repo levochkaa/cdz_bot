@@ -1,15 +1,15 @@
+import os
+
 import re
 import mesh
 import django
 from django.conf import settings
 from django.template import Template, Context
-from django.template.defaulttags import register
-from aiogram.types import InputFile
 from aiogram import Bot, Dispatcher, executor, types
 
 settings.configure(TEMPLATES=[{'BACKEND': 'django.template.backends.django.DjangoTemplates'}])
 django.setup()
-bot = Bot("2119600702:AAGkGcOHqh9iO8BnGiVc7yS388LAbHQk2X4")
+bot = Bot(os.environ['TOKEN'])
 dp = Dispatcher(bot)
 template = Template("""
 <html lang="ru">
@@ -110,7 +110,7 @@ async def send_text(message: types.Message):
                 })
         with open('site.html', 'w') as site:
             site.write(template.render(Context({"tasks": fixed_answers})))
-        await message.answer_document(InputFile('site.html'),
+        await message.answer_document(types.InputFile('site.html'),
                                       caption="ответики сайтиком")
     except Exception as e:
         await message.answer("типо ошибка но ответы мб норм")
