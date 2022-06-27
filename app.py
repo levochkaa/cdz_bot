@@ -3,10 +3,12 @@ import os
 import re
 import mesh
 import django
+from dotenv import load_dotenv
 from django.conf import settings
 from django.template import Template, Context
 from aiogram import Bot, Dispatcher, executor, types
 
+load_dotenv()
 settings.configure(TEMPLATES=[{'BACKEND': 'django.template.backends.django.DjangoTemplates'}])
 django.setup()
 bot = Bot(os.environ['TOKEN'])
@@ -15,6 +17,7 @@ template = Template("""
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ответики</title>
     <style>
         html {
